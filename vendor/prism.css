@@ -1,0 +1,33 @@
+/* Prism syntax highlighting — Tomorrow Night palette */
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #CDD6F4;
+  background: none;
+  font-family: 'DM Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+  tab-size: 2;
+}
+
+/* Shared tokens */
+.token.comment    { color: #6C7086; font-style: italic; }
+.token.string     { color: #A6E3A1; }
+.token.punctuation{ color: #CDD6F4; }
+.token.keyword    { color: #CBA6F7; }
+.token.number     { color: #FAB387; }
+
+/* CSS-specific */
+.token.atrule     { color: #CBA6F7; font-weight: bold; }
+.token.variable   { color: #F38BA8; }
+.token.hexcode    { color: #89DCEB; }
+.token.property   { color: #89B4FA; }
+
+/* HTML-specific */
+.token.doctype    { color: #6C7086; font-style: italic; }
+.token.tag        { color: #F38BA8; }
+.token.tag-name   { color: #FAB387; }
+.token.attr-name  { color: #89B4FA; }
+.token.attr-value { color: #A6E3A1; }

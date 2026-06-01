@@ -1,0 +1,13 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Local tooling / caches (not needed at runtime — this is a no-build static app)
+.venv/
+node_modules/
+.playwright-mcp/
+.cache/

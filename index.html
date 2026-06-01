@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TemplateTester — Interactive Design Template Gallery</title>
+  <meta name="description" content="Browse 15 opinionated design templates, preview them live, and download the CSS + HTML boilerplate." />
+
+  <!-- App shell fonts (Google Fonts CDN) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- App shell stylesheet -->
+  <link rel="stylesheet" href="css/app.css?v=10" />
+
+  <!-- Vendor: Prism.js (bundled inline, no CDN) -->
+  <link rel="stylesheet" href="vendor/prism.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════
+       FIXED HEADER
+  ════════════════════════════════════════════════════ -->
+  <header id="app-header" role="banner">
+    <div class="header-logo">
+      <span class="logo-text">TemplateTester</span>
+      <span class="logo-tagline">15 design templates, live preview</span>
+    </div>
+
+    <div class="header-search">
+      <label for="search-input" class="sr-only">Search templates</label>
+      <input
+        id="search-input"
+        type="search"
+        placeholder="Search templates…"
+        autocomplete="off"
+        aria-label="Search templates by name or category"
+      />
+    </div>
+
+    <div class="header-actions">
+      <button
+        id="btn-ai-drawer"
+        class="btn btn-ghost"
+        aria-expanded="false"
+        aria-controls="ai-drawer"
+        aria-label="Open AI template recommendation panel"
+      >
+        ✦ Find my template
+      </button>
+      <a
+        href="https://github.com/Dansen-L/TemplateTester"
+        class="btn btn-ghost"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="View source on GitHub"
+      >
+        GitHub
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════
+       MAIN CONTENT — split panel layout
+  ════════════════════════════════════════════════════ -->
+  <main id="app-body" role="main">
+
+    <!-- LEFT PANEL: Gallery -->
+    <section
+      id="gallery-shell"
+      aria-label="Template gallery"
+      role="region"
+    >
+      <!-- Filter bar -->
+      <div id="filter-bar" role="toolbar" aria-label="Filter templates">
+        <button class="chip chip-active" data-filter="all" aria-pressed="true">All</button>
+        <button class="chip" data-filter="dark"          aria-pressed="false">Dark</button>
+        <button class="chip" data-filter="light"         aria-pressed="false">Light</button>
+        <button class="chip" data-filter="minimal"       aria-pressed="false">Minimal</button>
+        <button class="chip" data-filter="colorful"      aria-pressed="false">Colorful</button>
+        <button class="chip" data-filter="typographic"   aria-pressed="false">Typographic</button>
+        <button class="chip" data-filter="glassmorphism" aria-pressed="false">Glassmorphism</button>
+        <button class="chip" data-filter="retro"         aria-pressed="false">Retro</button>
+        <button class="chip" data-filter="favorites"     aria-pressed="false">★ Favorites</button>
+        <span id="filter-badge" class="filter-badge" aria-live="polite" aria-atomic="true"></span>
+      </div>
+
+      <!-- Gallery grid — cards injected by JS -->
+      <div
+        id="gallery-grid"
+        role="group"
+        aria-label="Template cards"
+        tabindex="0"
+      ></div>
+
+      <!-- Zero-state placeholder -->
+      <div id="zero-state" class="zero-state" hidden aria-live="polite">
+        <div class="zero-state-icon" aria-hidden="true">◌</div>
+        <p class="zero-state-text">No templates match — try a different search or filter.</p>
+      </div>
+    </section>
+
+    <!-- Drag resize handle -->
+    <div
+      id="panel-resize-handle"
+      role="separator"
+      aria-label="Resize panel"
+      aria-orientation="vertical"
+      tabindex="0"
+    ></div>
+
+    <!-- RIGHT PANEL: Preview -->
+    <section id="preview-shell" aria-label="Template preview" role="region">
+
+      <!-- Preview toolbar -->
+      <div id="preview-toolbar" role="toolbar" aria-label="Preview controls">
+        <!-- Viewport simulator -->
+        <div class="viewport-controls" role="group" aria-label="Simulate viewport width">
+          <button class="btn btn-ghost viewport-btn active" data-width="1280" aria-pressed="true">
+            Desktop
+          </button>
+          <button class="btn btn-ghost viewport-btn" data-width="768" aria-pressed="false">
+            Tablet
+          </button>
+          <button class="btn btn-ghost viewport-btn" data-width="375" aria-pressed="false">
+            Mobile
+          </button>
+        </div>
+
+        <!-- Accent color customizer -->
+        <div id="accent-customizer" class="accent-customizer" hidden>
+          <label for="accent-picker" class="accent-label">Accent</label>
+          <input
+            id="accent-picker"
+            type="color"
+            aria-label="Customize template accent color"
+          />
+          <button id="btn-accent-reset" class="btn btn-ghost btn-sm" aria-label="Reset accent to default">
+            Reset
+          </button>
+        </div>
+
+        <!-- Copy / Share / Download actions -->
+        <button id="btn-copy-css"  class="btn btn-ghost btn-sm" aria-label="Copy template CSS to clipboard">Copy CSS</button>
+        <button id="btn-copy-html" class="btn btn-ghost btn-sm" aria-label="Copy template HTML boilerplate to clipboard">Copy HTML</button>
+        <button id="btn-share"     class="btn btn-ghost btn-sm" aria-label="Copy shareable link for this template">⇗ Share</button>
+        <button id="btn-download-preview" class="btn btn-primary btn-sm" aria-label="Download this template">Download</button>
+      </div>
+
+      <!-- Preview surface — mock page content injected here -->
+      <div id="preview-surface-wrapper">
+        <div id="preview-surface" role="document" aria-label="Template preview surface">
+          <!-- Mock page skeleton injected by JS -->
+        </div>
+      </div>
+
+      <!-- Code inspector drawer -->
+      <div id="code-inspector" aria-label="Code inspector" aria-expanded="false">
+        <button
+          id="btn-inspector-toggle"
+          class="inspector-toggle"
+          aria-expanded="false"
+          aria-controls="inspector-content"
+        >
+          <span class="inspector-toggle-label">Code Inspector</span>
+          <span class="inspector-toggle-icon" aria-hidden="true">›</span>
+        </button>
+        <div id="inspector-content" hidden>
+          <div class="inspector-tabs" role="tablist" aria-label="Code inspector tabs">
+            <button role="tab" aria-selected="true"  aria-controls="inspector-css-panel"  id="tab-css">CSS</button>
+            <button role="tab" aria-selected="false" aria-controls="inspector-html-panel" id="tab-html">HTML</button>
+          </div>
+          <div id="inspector-css-panel"  role="tabpanel" aria-labelledby="tab-css">
+            <pre><code id="inspector-css-code"  class="language-css"></code></pre>
+          </div>
+          <div id="inspector-html-panel" role="tabpanel" aria-labelledby="tab-html" hidden>
+            <pre><code id="inspector-html-code" class="language-html"></code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════
+       AI RECOMMENDATION DRAWER
+  ════════════════════════════════════════════════════ -->
+  <aside
+    id="ai-drawer"
+    role="dialog"
+    aria-modal="false"
+    aria-label="AI template recommendation"
+    aria-hidden="true"
+  >
+    <div class="drawer-header">
+      <h2 class="drawer-title">✦ Find my template</h2>
+      <button id="btn-close-drawer" class="btn btn-ghost btn-icon" aria-label="Close AI recommendation panel">✕</button>
+    </div>
+
+    <div id="ai-key-section" class="ai-key-section">
+      <label for="ai-api-key" class="ai-key-label">Anthropic API Key</label>
+      <input
+        id="ai-api-key"
+        type="password"
+        placeholder="sk-ant-…"
+        autocomplete="off"
+        aria-label="Anthropic API key (stored in session only)"
+      />
+      <p class="ai-key-hint">Your key is stored in sessionStorage only and never sent anywhere except Anthropic's API.</p>
+    </div>
+
+    <div class="ai-prompt-section">
+      <label for="ai-description" class="ai-prompt-label">Describe your project</label>
+      <textarea
+        id="ai-description"
+        rows="4"
+        placeholder="e.g. a minimal blog for a travel photographer"
+        aria-label="Project description for AI template recommendation"
+      ></textarea>
+      <button
+        id="btn-recommend"
+        class="btn btn-primary"
+        disabled
+        aria-label="Get AI template recommendations"
+      >
+        Recommend
+      </button>
+    </div>
+
+    <div id="ai-results" class="ai-results" aria-live="polite" aria-atomic="false">
+      <!-- Results / skeleton / error injected by JS -->
+    </div>
+
+    <div id="ai-timer" class="ai-timer" hidden aria-live="polite">
+      <span id="ai-countdown">15</span>s
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════
+       DOWNLOAD MODAL
+  ════════════════════════════════════════════════════ -->
+  <div
+    id="download-modal-backdrop"
+    class="modal-backdrop"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="download-modal-title"
+  >
+    <div id="download-modal" class="modal">
+      <div class="modal-header">
+        <h2 id="download-modal-title" class="modal-title">Download Template</h2>
+        <button id="btn-close-download" class="btn btn-ghost btn-icon" aria-label="Close download modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-template-name" id="download-modal-template-name"></p>
+        <fieldset>
+          <legend class="sr-only">Choose download format</legend>
+          <label class="download-option">
+            <input type="radio" name="download-format" value="css" checked />
+            <span class="option-label">CSS only</span>
+            <span class="option-desc">.css file — just the custom properties + overrides</span>
+          </label>
+          <label class="download-option">
+            <input type="radio" name="download-format" value="html" />
+            <span class="option-label">HTML boilerplate</span>
+            <span class="option-desc">Complete standalone .html with CDN font tags</span>
+          </label>
+          <label class="download-option">
+            <input type="radio" name="download-format" value="zip" />
+            <span class="option-label">Both — ZIP</span>
+            <span class="option-desc">style.css + index.html bundled as a .zip</span>
+          </label>
+        </fieldset>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-download-confirm" class="btn btn-primary">Download</button>
+        <button id="btn-download-cancel"  class="btn btn-ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clipboard fallback modal -->
+  <div
+    id="clipboard-modal-backdrop"
+    class="modal-backdrop"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="clipboard-modal-title"
+  >
+    <div id="clipboard-modal" class="modal">
+      <div class="modal-header">
+        <h2 id="clipboard-modal-title" class="modal-title">Copy to clipboard</h2>
+        <button id="btn-close-clipboard" class="btn btn-ghost btn-icon" aria-label="Close copy modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Select all and copy:</p>
+        <textarea id="clipboard-fallback-content" class="clipboard-fallback" readonly aria-label="Code to copy"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile preview bottom sheet (shown on ≤768px when a card is tapped) -->
+  <div
+    id="mobile-preview-modal"
+    class="mobile-preview-modal"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-label="Template preview"
+    aria-labelledby="mobile-preview-title"
+  >
+    <div class="mobile-preview-header">
+      <span id="mobile-preview-title" class="mobile-preview-name"></span>
+      <div class="mobile-preview-nav" role="group" aria-label="Navigate templates">
+        <button id="btn-mobile-prev" class="btn btn-ghost btn-sm" aria-label="Previous template">‹</button>
+        <button id="btn-mobile-next" class="btn btn-ghost btn-sm" aria-label="Next template">›</button>
+      </div>
+      <button id="btn-mobile-download" class="btn btn-primary btn-sm" aria-label="Download template">Download</button>
+      <button id="btn-mobile-close" class="btn btn-ghost btn-icon" aria-label="Close preview">✕</button>
+    </div>
+    <div id="mobile-preview-surface" class="mobile-preview-surface"></div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════════════════════════ -->
+  <!-- Vendor -->
+  <script src="vendor/jszip.min.js"></script>
+  <script src="vendor/prism.js"></script>
+
+  <!-- App modules -->
+  <script type="module" src="js/templates.js?v=10"></script>
+  <script type="module" src="js/app.js?v=10"></script>
+</body>
+</html>
